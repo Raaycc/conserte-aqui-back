@@ -1,0 +1,40 @@
+version: '3.1'
+
+# Named volumes
+volumes:
+  # MySQL Data
+  conserte-aqui-mysql-data:
+    driver: local
+
+services:
+  # MySQL (5.7)
+  mysql:
+    image: ambientum/mysql:5.7
+    container_name: conserte-aqui-mysql
+    volumes:
+    - conserte-aqui-mysql-data:/var/lib/mysql
+    ports:
+    - "3306:3306"
+    environment:
+    - MYSQL_ROOT_PASSWORD=conserte-aqui
+    - MYSQL_DATABASE=conserte-aqui
+    - MYSQL_USER=conserte-aqui
+    - MYSQL_PASSWORD=conserte-aqui
+
+  # PHP (with Caddy)
+  app:
+    image: ambientum/php:7.1-caddy
+    container_name: conserte-aqui-app
+    volumes:
+    - .:/var/www/app
+    ports:
+    - "80:8080"
+    links:
+    - mysql
+
+  adminer:
+    image: adminer:4.7.1
+    ports:
+    - "8080:8080"
+    links:
+    - mysql
